@@ -3,6 +3,7 @@ import { User } from '../../interfaces'
 import UserRepository from '../../repositories/userRepository/userRepository'
 import CustomError from '../../helpers/customError'
 import { errorCodes } from '../../constants'
+import { UserModel } from '../../models'
 
 @injectable()
 export default class UserService {
@@ -42,6 +43,10 @@ export default class UserService {
 
   async createToken(payload: object): Promise<string> {
     return await this.userRepository.createToken(payload)
+  }
+
+  async getUsersById(email : string){
+    return await UserModel.findOne({email}).exec();
   }
 
   async asingnRoles(roleName) {}

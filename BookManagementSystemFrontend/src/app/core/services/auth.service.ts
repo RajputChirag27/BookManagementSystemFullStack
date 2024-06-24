@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 
 @Injectable({
@@ -9,16 +10,19 @@ export class AuthService {
 
   constructor(private readonly http : HttpClient) { }
 
+   isLoggedInn = new BehaviorSubject<boolean>(localStorage.getItem('authToken') !== null);
+
   login(data : any){
     return this.http.post(`${environment.apiUrl}/users/login`, data);
   }
 
   setToken(token : string){
     localStorage.setItem('authToken', token);
+    this.isLoggedInn.next(true); 
   }
 
   getToken(){
-    localStorage.getItem('authToken');
+    return localStorage.getItem('authToken');
   }
 
   setRole(userRole : string){
@@ -26,10 +30,15 @@ export class AuthService {
   }
 
   getRole(){
-    localStorage.getItem('role');
+    return localStorage.getItem('role');
+  }
+
+  isLoggedIn(){
+    return this.isLoggedInn.asObservable();
   }
 
   logout(){
     localStorage.clear();
+    this.isLoggedInn.next(false);
   }
 }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormGroup, FormBuilder,Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { IAuth } from 'src/app/core/interfaces/IAuth';
 import { UserService } from 'src/app/core/services/user.service';
 @Component({
   selector: 'app-signup',
@@ -25,16 +26,20 @@ export class SignupComponent {
 
   onSubmit() {
     if (this.signupForm.valid) {
-      console.log(this.signupForm)
-      this._userService.createUser(this.signupForm.value).subscribe(
+      const formData : IAuth = this.signupForm.value;
+      console.log(formData)
+      this._userService.createUser(formData).subscribe(
         (response : any) => {
           this.toastr.info('User created successfully', 'Success!!');
           console.log('User created successfully', response);
           this.router.navigate(['/login'])
         },
         (error : any) => {
-          this.toastr.info('Error creating user', 'Sign In Error!!');
           console.error('Error creating user', error);
+          if(error.error.errors){
+            this.toastr.error(error.error.errors[0].message, 'Error!!');
+          } else
+          this.toastr.error(`${error.error.error}`, 'Sign In Error!!');
         }
       );
     } else {

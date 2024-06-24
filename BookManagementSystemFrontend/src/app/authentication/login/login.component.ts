@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IAuth } from 'src/app/core/interfaces/IAuth';
 
 @Component({
   selector: 'app-login',
@@ -33,7 +34,7 @@ export class LoginComponent {
   onSubmit() {
     const { email, password, rememberMe } = this.myForm.value; // Destructure email and password from form value
     console.log( { email, password, rememberMe });
-      const result =  this._authService.login({email, password} ).subscribe(
+      const result =  this._authService.login({email, password} as Partial<IAuth> ).subscribe(
       (response: any) => {
         // Assuming setToken function is correct in AuthService
         console.log(response)
@@ -44,7 +45,7 @@ export class LoginComponent {
         });
           this._authService.setToken(response.token);
           this._authService.setRole(response.userFromDb.role)
-          this.router.navigate(['/layouts']);
+          this.router.navigate(['/pages/home']);
       },
       (error : any) => {
         // console.log(error.error.error)

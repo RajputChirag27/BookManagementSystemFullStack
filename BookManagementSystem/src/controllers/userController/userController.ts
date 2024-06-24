@@ -15,6 +15,8 @@ import {
   JwtAuthenticationMiddleware,
   ValidatorMiddleWare,
 } from '../../middlewares'
+import CustomError from '../../helpers/customError'
+import { errorCodes } from '../../constants'
 dotenv.config()
 
 @controller('/users')
@@ -29,9 +31,15 @@ export class UserController {
       const hashedPassword: string = await this.userService.hashPassword(
         user.password
       )
+      if(!hashedPassword){
+        throw new CustomError("Invalid Password", errorCodes.BAD_REQUEST, "Not Created");
+      }
       user.password = hashedPassword
       // Create new user
       const newUser = await this.userService.signup(user)
+      if(!newUser){
+        throw new CustomError("User Not Created", errorCodes.BAD_REQUEST, "Not Created");
+      }
       res.status(201).json(newUser)
     } catch (error) {
       customErrorHandler(error, req, res, next)
@@ -86,4 +94,19 @@ export class UserController {
       customErrorHandler(err, req, res, next)
     }
   }
+
+  @httpGet("/profile", JwtAuthenticationMiddleware)
+  async getUsersProfile(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const email = req.user.email;
+      console.log(email);
+      const user = await this.userService.getUsersById(email);
+      if (user) {
+        res.send(user);
+      }
+    } catch (err) {
+      if (!res.headersSent)  customErrorHandler(err, req, res, next);
+    }
+  }
+
 }

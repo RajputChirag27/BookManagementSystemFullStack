@@ -26,6 +26,6 @@ export class HeaderComponent {
       closeButton: true,
       progressBar: true,
     });
-    this.router.navigate(['login'])
+    this.router.navigate(['authentication/login'])
    }
 }
